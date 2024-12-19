@@ -42,7 +42,7 @@ class MinPathProblem(Problem):
 
 
 def load_elems(path):
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         elems = json.load(f)
 
     for i, elem in enumerate(elems):
@@ -55,7 +55,8 @@ def load_elems(path):
     return nodes, edges
 
 
-def search(problem: Problem):
+def solve(init, goal, nodes, edges):
+    problem = MinPathProblem(init, goal, nodes, edges)
     limit = 8
     b = depth_limited_search(problem, limit)
     length = b.path_cost
@@ -63,13 +64,8 @@ def search(problem: Problem):
     return length, path
 
 
-def solve(init, goal, nodes, edges):
-    problem = MinPathProblem(init, goal, nodes, edges)
-    return search(problem)
-
-
 if __name__ == "__main__":
-    nodes, edges = load_elems("elem_full.json")
+    nodes, edges = load_elems("json/elem_full.json")
     for node in nodes:
         if node["data"]["label"] == "Липецк":
             initial = (node["data"]["id"], node["data"]["label"])
