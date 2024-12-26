@@ -14,25 +14,32 @@
 # так, чтобы робот не превысил лимит по глубине перемещения.
 
 
+from typing import Generator, Optional
+
 from tree import Problem
 from tree import depth_limited_search as dls
 
 
 class BinaryTreeNode:
-    def __init__(self, value, left=None, right=None):
+    def __init__(
+        self,
+        value: int,
+        left: Optional["BinaryTreeNode"] = None,
+        right: Optional["BinaryTreeNode"] = None,
+    ):
         self.value = value
         self.left = left
         self.right = right
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.value}>"
 
 
 class NavigateProblem(Problem):
-    def __init__(self, initial, goal):
+    def __init__(self, initial: BinaryTreeNode, goal: int):
         super().__init__(initial, goal)
 
-    def actions(self, state):
+    def actions(self, state: BinaryTreeNode) -> Generator[BinaryTreeNode, None, None]:
         left = state.left
         right = state.right
         if left:
@@ -40,14 +47,14 @@ class NavigateProblem(Problem):
         if right:
             yield right
 
-    def result(self, state, action):
+    def result(self, state: BinaryTreeNode, action: BinaryTreeNode) -> BinaryTreeNode:
         return action
 
-    def is_goal(self, state):
-        return state.value == self.goal
+    def is_goal(self, state: BinaryTreeNode) -> bool:
+        return state.value == self.goal  # type: ignore
 
 
-def solve(root, goal, limit):
+def solve(root: BinaryTreeNode, goal: int, limit: int) -> bool:
     problem = NavigateProblem(root, goal)
     r = dls(problem, limit)
     return bool(r)

@@ -9,25 +9,32 @@
 # ограничив поиск заданной глубиной, чтобы гарантировать,
 # что поиск займет приемлемое время.
 
-from tree import Problem
+from typing import Generator, Optional
+
+from tree import Node, Problem
 from tree import depth_limited_search as dls
 
 
 class BinaryTreeNode:
-    def __init__(self, value, left=None, right=None):
+    def __init__(
+        self,
+        value: int,
+        left: Optional["BinaryTreeNode"] = None,
+        right: Optional["BinaryTreeNode"] = None,
+    ):
         self.value = value
         self.left = left
         self.right = right
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.value}>"
 
 
 class StockProblem(Problem):
-    def __init__(self, initial, goal):
+    def __init__(self, initial: BinaryTreeNode, goal: int) -> None:
         super().__init__(initial, goal)
 
-    def actions(self, state):
+    def actions(self, state: BinaryTreeNode) -> Generator[BinaryTreeNode, None, None]:
         left = state.left
         right = state.right
         if left:
@@ -35,16 +42,16 @@ class StockProblem(Problem):
         if right:
             yield right
 
-    def result(self, state, action):
+    def result(self, state: BinaryTreeNode, action: BinaryTreeNode) -> BinaryTreeNode:
         return action
 
-    def is_goal(self, state):
-        return state.value == self.goal
+    def is_goal(self, state: BinaryTreeNode) -> bool:
+        return state.value == self.goal  # type: ignore
 
 
-def solve(root, goal, limit):
+def solve(root: BinaryTreeNode, goal: int, limit: int) -> Node:
     problem = StockProblem(root, goal)
-    r = dls(problem, limit)
+    r: Node = dls(problem, limit)
     return r
 
 
@@ -58,7 +65,7 @@ if __name__ == "__main__":
     limit = 2
     r = solve(root, goal, limit)
     if r:
-        st = f"Цель найдена: {r.state}"
+        st = f"Цель найдена: {r.state}"  # type: ignore
     else:
         st = "Цель не найдена"
     print("Первое дерево-пример. ", st)
@@ -80,7 +87,7 @@ if __name__ == "__main__":
     limit = 2
     r = solve(root2, goal, limit)
     if r:
-        st = f"Цель найдена: {r.state}"
+        st = f"Цель найдена: {r.state}"  # type: ignore
     else:
         st = "Цель не найдена"
-    print("Второе дерево: ", st)
+    print("Второе дерево. ", st)

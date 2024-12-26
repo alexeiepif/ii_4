@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Представьте, что вы разрабатываете систему
@@ -8,24 +8,31 @@
 # наилучший исход (максимальную прибыль) на определённой глубине принятия решений,
 # учитывая ограниченные ресурсы и время на анализ.
 
+from typing import Generator, Optional
+
 from tree import LIFOQueue, Node, Problem, expand, is_cycle
 
 
 class BinaryTreeNode:
-    def __init__(self, value, left=None, right=None):
+    def __init__(
+        self,
+        value: int,
+        left: Optional["BinaryTreeNode"] = None,
+        right: Optional["BinaryTreeNode"] = None,
+    ) -> None:
         self.value = value
         self.left = left
         self.right = right
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.value}>"
 
 
 class InvestProblem(Problem):
-    def __init__(self, initial):
+    def __init__(self, initial: BinaryTreeNode) -> None:
         super().__init__(initial)
 
-    def actions(self, state):
+    def actions(self, state: BinaryTreeNode) -> Generator[BinaryTreeNode, None, None]:
         left = state.left
         right = state.right
         if left:
@@ -33,30 +40,25 @@ class InvestProblem(Problem):
         if right:
             yield right
 
-    def result(self, state, action):
+    def result(self, state: BinaryTreeNode, action: BinaryTreeNode) -> BinaryTreeNode:
         return action
 
-    def is_goal(self, state):
-        return state.value == self.goal
 
-
-def dls(problem, limit=10):
+def dls(problem: Problem, limit: int = 10) -> int:
     """В первую очередь ищем самые глубокие узлы в дереве поиска."""
-    frontier = LIFOQueue([Node(problem.initial)])
+    frontier = LIFOQueue([Node(problem.initial)])  # type: ignore
     result = []
     while frontier:
         node = frontier.pop()
-        if problem.is_goal(node.state):
-            return node
-        elif len(node) == limit:
-            result.append(node.state.value)
+        if len(node) == limit:
+            result.append(node.state.value)  # type: ignore
         elif not is_cycle(node):
             for child in expand(problem, node):
                 frontier.append(child)
-    return max(result or [0])
+    return max(result) if result else 0
 
 
-def solve(root, limit):
+def solve(root: BinaryTreeNode, limit: int) -> int:
     problem = InvestProblem(root)
     r = dls(problem, limit)
     return r
@@ -89,7 +91,7 @@ if __name__ == "__main__":
             BinaryTreeNode(13, None, BinaryTreeNode(12)),
         ),
     )
-    goal = 8
+
     limit = 3
     r = solve(root2, limit)
     if r:
